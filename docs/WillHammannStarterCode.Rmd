@@ -1,0 +1,70 @@
+---
+title: "Hispanic Student Attendance of Maryland Public Schools 2020-2026 - Will Hammann"
+author: "Wells"
+date: "2026-05-25"
+output: html_document
+---
+
+# load libraries
+```{r}
+# install.packages("tidyverse")
+# install.packages("tidycensus")
+# install.packages("janitor")
+library(tidyverse)
+library(tidycensus)
+library(janitor)
+
+```
+
+#load and clean data
+```{r}
+# there are files with the same naming format for 2021-2026 in the same location. Only files for the years 
+# 2020-2022 require renaming lss to lea and lss_name to lea_name
+data_2020<-read_csv("../data/Enrollment_By_Race_2020.csv") |>
+     clean_names() |> 
+     rename(lea = lss, lea_name = lss_name)
+
+data_2020$enrolled_count[data_2020$enrolled_count == '*'] <- NA
+data_2020$enrolled_count <- as.numeric(data_2020$enrolled_count)
+
+```
+
+## Attendance by Race for 2020
+
+```{r}
+options(scipen = 999)  # Disable scientific notation globally
+
+data_2020 |> 
+group_by(race) |> 
+  summarize(
+    Attendance = sum(enrolled_count, na.rm = TRUE)
+  ) |> 
+  arrange(race)
+
+```
+
+## Attendance by Race by County for 2020
+
+```{r}
+options(scipen = 999)  # Disable scientific notation globally
+
+data_2020 |> 
+group_by(lea_name, race) |> 
+  summarize(
+    Attendance = sum(enrolled_count, na.rm = TRUE)
+  ) |> 
+  arrange(lea_name, race)
+
+```
+
+## Attendance by Race by School for a Specific County in 2020
+```{r}
+data_2020 |> 
+  filter(lea_name == "Calvert") |> 
+  group_by(school_name, race) |>
+  summarize(
+    Attendance = sum(enrolled_count, na.rm = TRUE)
+  ) |> 
+  arrange(school_name, race)
+
+```
