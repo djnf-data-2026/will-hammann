@@ -1,4 +1,101 @@
 ---
+title: "ICE activity and Hispanic school enrollment in MD Memo - Will Hammann"
+author: "Hammann"
+date: "2026-06-01"
+output: html_document
+---
+
+## ICE activity and Hispanic school enrollment in MD schools
+
+Maryland consistently grew in its Hispanic student enrollment during the presidency of Joe Biden until the start of 2026, after the first full year after the second inauguration of President Donald Trump.
+
+Not including those with extremely small samples, the counties have their lowest percent changes in Hispanic student enrollment in Y2021 and Y2026. The years between show steady growth. The pivotal turns of enrollment, Y2022 and Y2026, represent a full year after the transition of President Biden and after the transition into Trump respectively.
+
+I plan to visualize this trend, look deeper at standout municipalities and compare the enrollment data to ICE arrest data, the existence of 287(g) agreements.
+
+## Existing Reporting
+
+Maryland and DMV outlets like WTOP and others reported a drop of 4.4% in the 2025 graduation rate of Hispanic students in the state, according to School Board President Josh Michael. The news, released Jan. 2026, represents the full year of 2025 like year 2026 does in my enrollment dataset.
+
+Statistical research by Stanford professors showed a 7.3% decrease in Hispanic enrollment in counties ICE partnerships with local police nationwide in the 2000s, establishing precedent for a relationship between 287(g) agreements and Hispanic student enrollment.
+
+A 287(g) tracker with data available on Github shows the existence of these agreements overtime. This would be more challenging but could be possible, and especially exigent to show a potential rebound for Hispanic enrollment in lieu of the February emergency legislation banning such agreements in the state of Maryland, which gave communities three months to break them off and has yet to release data showing the difference.
+
+https://marylandmatters.org/2026/02/18/moore-signs-bills-banning-agreements-between-local-police-federal-immigration-agencies/
+
+## Visuals
+
+The statewide low points at 2021 and 2026, with growth in between, would make for a perfectly clear line graph with markers designating Biden's exit and the entrance of Trump 2.0. I could make a map using ICE arrest data and also make visuals representing the enrollment change in municipalities where I end up reporting.
+
+## Potential Sources
+
+As I said, I have to look at specific schools within municipalties that suffered harsh enrollment losses. From my personal reporting experience in Hyattsville, I know members of the Cesar Chavez Dual Immersion School's PTO who have voiced concerns of ICE activity and its impact consistently over years. I can seek out individuals in areas where the data points me to as well.
+
+I've spoken to George Escobar at CASA who is a great speaker and excellent source on immigrant advocacy. I can also reach at various levels, including Congressman Glenn Ivey of District 4 in Prince George's, which along with Montgomery County make up half the state's Hispanic student enrollment.
+
+## What's Next
+
+I need to analyze my ICE arrest data, look further at municipalities within counties to find fertile reporting ground and compare municipalities with 287(g) agreements when they were still active.
+
+#load libraries
+
+```{r}
+# install.packages("tidyverse")
+# install.packages("tidycensus")
+# install.packages("janitor")
+library(tidyverse)
+library(tidycensus)
+library(janitor)
+
+```
+
+#Load and clean data (and combining)
+
+```{r}
+# There are files with the same naming format for 2021-2026 in the same location. Only files for the years 2020-2022 require renaming lss to lea and lss_name to lea_name
+# After cleaning datasets of all years, they can be easily combined and cleaned a bit more so columns are strings or numeric where they should be.
+data_2020<-read_csv("../data/Enrollment_By_Race_2020.csv") |>
+     clean_names() |> 
+     rename(lea = lss, lea_name = lss_name)
+
+data_2021<-read_csv("../data/Enrollment_By_Race_2021.csv") |>
+     clean_names() |> 
+     rename(lea = lss, lea_name = lss_name)
+
+data_2022<-read_csv("../data/Enrollment_By_Race_2022.csv") |>
+     clean_names() |>
+     rename(lea = lss, lea_name = lss_name)
+
+data_2023<-read_csv("../data/Enrollment_By_Race_2023.csv") |>
+     clean_names()
+
+data_2024<-read_csv("../data/Enrollment_By_Race_2024.csv") |>
+     clean_names()
+
+data_2025<-read_csv("../data/Enrollment_By_Race_2025.csv") |>
+     clean_names()
+
+data_2026<-read_csv("../data/Enrollment_By_Race_2026.csv") |>
+     clean_names()
+
+data_combined<-bind_rows(list(data_2020, data_2021, data_2022, data_2023, data_2024, data_2025, data_2026))
+
+data_combined$enrolled_count[data_combined$enrolled_count == '*'] <- NA
+
+
+data_combined<-data_combined |>
+  mutate(
+    enrolled_count = as.numeric(enrolled_count),
+    across(where(is.character), str_to_lower),
+    create_date = as.Date(as.character(create_date), format = "%Y%m%d"),
+    lea_name = str_replace_all(lea_name, "'", ""),
+    school_name = str_replace_all(school_name, "'", "")
+  )
+```
+
+------------------------------------------------------------------------
+
+---
 title: "Hosting a GitHub Page"
 author: "Rob Wells"
 date: "5-29-2026"

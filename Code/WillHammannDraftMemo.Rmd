@@ -4,18 +4,7 @@ author: "Hammann"
 date: "2026-06-01"
 output: html_document
 ---
-
-##The data shows a XX enrollment in Prince George's and Montgomery counties from YYYY to YYYY, the two highest concentrations of Hispanic residents among MD counties. 
-
-## There was a 4.4% drop in graduation rates for Hispanic students and a 5.5% drop for what education officials categorize as multilanguage learners in MD schools in 2025. VERIFY WITH DATA
-
-##Statistical research by Stanford professors showed a 7.3% decrease in Hispanic enrollment in counties ICE partnerships with local police nationwide in the 2000s, establishing precedent for...
-
-I plan to look at the level of Hispanic student enrollment in Maryland schools with high Hispanic populations post-immigration crackdown of the Trump administration. Including but not exclusive to his administration, I can also look at the correlation between Hispanic enrollment and 287(g) agreements in counties or even municipalities. The data is from 2020-26 and includes individual schools so I can get deep into standout examples after further analysis. 
-
-## Potential Sources
-# 
-
+##INTRO
 
 # load libraries
 ```{r}
@@ -25,49 +14,112 @@ I plan to look at the level of Hispanic student enrollment in Maryland schools w
 library(tidyverse)
 library(tidycensus)
 library(janitor)
-
 ```
 
-#load and clean data
+#load and clean data (and combining)
 ```{r}
-# there are files with the same naming format for 2021-2026 in the same location. Only files for the years 
-# 2020-2022 require renaming lss to lea and lss_name to lea_name
+# There are files with the same naming format for 2021-2026 in the same location. Only files for the years 2020-2022 require renaming lss to lea and lss_name to lea_name
+# After cleaning datasets of all years, they can be easily combined and cleaned a bit more so columns are strings or numeric where they should be.
 data_2020<-read_csv("../data/Enrollment_By_Race_2020.csv") |>
      clean_names() |> 
      rename(lea = lss, lea_name = lss_name)
 
-data_2020$enrolled_count[data_2020$enrolled_count == '*'] <- NA
-data_2020$enrolled_count <- as.numeric(data_2020$enrolled_count)
+data_2021<-read_csv("../data/Enrollment_By_Race_2021.csv") |>
+     clean_names() |> 
+     rename(lea = lss, lea_name = lss_name)
 
+data_2022<-read_csv("../data/Enrollment_By_Race_2022.csv") |>
+     clean_names() |>
+     rename(lea = lss, lea_name = lss_name)
+
+data_2023<-read_csv("../data/Enrollment_By_Race_2023.csv") |>
+     clean_names()
+
+data_2024<-read_csv("../data/Enrollment_By_Race_2024.csv") |>
+     clean_names()
+
+data_2025<-read_csv("../data/Enrollment_By_Race_2025.csv") |>
+     clean_names()
+
+data_2026<-read_csv("../data/Enrollment_By_Race_2026.csv") |>
+     clean_names()
+
+data_combined<-bind_rows(list(data_2020, data_2021, data_2022, data_2023, data_2024, data_2025, data_2026))
+
+data_combined$enrolled_count[data_combined$enrolled_count == '*'] <- NA
+
+
+data_combined<-data_combined |>
+  mutate(
+    enrolled_count = as.numeric(enrolled_count),
+    across(where(is.character), str_to_lower),
+    create_date = as.Date(as.character(create_date), format = "%Y%m%d"),
+    lea_name = str_replace_all(lea_name, "'", ""),
+    school_name = str_replace_all(school_name, "'", "")
+  )
 ```
 
-## Attendance by Race for 2020
+**FINDING** All counties but XX saw significant growth in Hispanic student enrollment in 2024. 
+
+Maryland and DMV outlets reported a drop of 4.4% in the graduation rate of Hispanic students in the state according to School Board President Josh Michael. 
+
+**NOTE** 
+Data is created near the start of the calendar year it represents. E.g., percent change for 2026 is the change from the beginning of 2025 to beginning of 2026. 
+
 
 ```{r}
 options(scipen = 999)  # Disable scientific notation globally
 
-data_2020 |> 
-group_by(race) |> 
-  summarize(
-    Attendance = sum(enrolled_count, na.rm = TRUE)
+state_data <- data_combined |> 
+  filter(
+    lea_name == "state",
+    race == "hispanic/latino of any race",
+  ) |>
+  group_by(year) |> 
+    summarize(
+      attendance = sum(enrolled_count, na.rm = TRUE),
+      .groups = "drop"
   ) |> 
-  arrange(race)
+  arrange(year) |>
+  mutate(
+    pct_change = 100 * (attendance / lag(attendance) - 1)
+  )
 
+counties_data <- data_combined |> 
+  filter(
+    race == "hispanic/latino of any race",
+    school != "a"
+  ) |>
+  group_by(lea_name, year) |>
+  summarize(
+    attendance = sum(enrolled_count, na.rm = TRUE),
+    .groups = "drop"
+  ) |> 
+  arrange(lea_name, year) |>
+  mutate(
+    pct_change = 100 * (attendance / lag(attendance) - 1)
+  )
+
+state_data |>
+  filter(year != "2020")
+
+counties_data |>
+  filter(year != "2020")
 ```
 
-## Attendance by Race by County for 2020
 
+## Statistical research by Stanford professors showed a 7.3% decrease in Hispanic enrollment in counties ICE partnerships with local police nationwide in the 2000s, establishing precedent for...
+
+## Including but not exclusive to his administration, I can also look at the correlation between Hispanic enrollment and 287(g) agreements in counties or even municipalities.
 ```{r}
-options(scipen = 999)  # Disable scientific notation globally
-
-data_2020 |> 
-group_by(lea_name, race) |> 
-  summarize(
-    Attendance = sum(enrolled_count, na.rm = TRUE)
-  ) |> 
-  arrange(lea_name, race)
-
+dhs_287gs<-read.csv("../data/287g_agreements_dhs.csv") |>
+  clean_names()
 ```
+
+
+## Potential Sources
+# 
+
 
 ## Attendance by Race by School for a Specific County in 2020
 ```{r}
@@ -80,8 +132,3 @@ data_2020 |>
   arrange(school_name, race)
 
 ```
-
-```{r}
-
-```
-
