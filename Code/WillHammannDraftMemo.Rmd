@@ -4,9 +4,44 @@ author: "Hammann"
 date: "2026-06-01"
 output: html_document
 ---
-##INTRO
 
-# load libraries
+##ICE activity and Hispanic school enrollment in MD schools
+
+Maryland consistently grew in its Hispanic student enrollment during the presidency of Joe Biden until the start of 2026, after the first full year after the second inauguration of President Donald Trump. 
+
+Not including those with extremely small samples, the counties have their lowest percent changes in Hispanic student enrollment in Y2021 and Y2026. The years between show steady growth. The pivotal turns of enrollment, Y2022 and Y2026, represent a full year after the transition of President Biden and after the transition into Trump respectively. 
+
+I plan to visualize this trend, look deeper at standout municipalities and compare the enrollment data to ICE arrest data, the existence of 287(g) agreements.
+
+##Existing Reporting
+
+Maryland and DMV outlets like WTOP and others reported a drop of 4.4% in the 2025 graduation rate of Hispanic students in the state, according to School Board President Josh Michael. The news, released Jan. 2026, represents the full year of 2025 like year 2026 does in my enrollment dataset.
+
+Statistical research by Stanford professors showed a 7.3% decrease in Hispanic enrollment in counties ICE partnerships with local police nationwide in the 2000s, establishing precedent for a relationship between 287(g) agreements and Hispanic student enrollment. 
+
+A 287(g) tracker with data available on Github shows the existence of these agreements overtime. This would be more challenging but could be possible, and especially exigent to show a potential rebound for Hispanic enrollment in lieu of the February emergency legislation banning such agreements in the state of Maryland, which gave communities three months to break them off and has yet to release data showing the difference. 
+
+https://marylandmatters.org/2026/02/18/moore-signs-bills-banning-agreements-between-local-police-federal-immigration-agencies/ 
+
+##Visuals
+
+The statewide low points at 2021 and 2026, with growth in between, would make for a perfectly clear line graph with markers designating Biden's exit and the entrance of Trump 2.0. I could make a map using ICE arrest data and also make visuals representing the enrollment change in municipalities where I end up reporting. 
+
+##Potential Sources
+
+As I said, I have to look at specific schools within municipalties that suffered harsh enrollment losses. From my personal reporting experience in Hyattsville, I know members of the Cesar Chavez Dual Immersion School's PTO who have voiced concerns of ICE activity and its impact consistently over years. I can seek out individuals in areas where the data points me to as well.
+
+I've spoken to George Escobar at CASA who is a great speaker and excellent source on immigrant advocacy. I can also reach politicians at various levels, including Congressman Glenn Ivey of District 4 in Prince George's, which along with Montgomery County make up half the state's Hispanic student enrollment. 
+
+##What's Next
+
+I need to analyze my ICE arrest data, look further at municipalities within counties to find fertile reporting ground and compare municipalities with 287(g) agreements when they were still active. 
+
+- Find school with leading drop of Hispanic enrollment
+- Compare counties for a graphic
+
+
+Load libraries.
 ```{r}
 # install.packages("tidyverse")
 # install.packages("tidycensus")
@@ -16,7 +51,7 @@ library(tidycensus)
 library(janitor)
 ```
 
-#load and clean data (and combining)
+Load, clean and combine enrollment and demographic data.
 ```{r}
 # There are files with the same naming format for 2021-2026 in the same location. Only files for the years 2020-2022 require renaming lss to lea and lss_name to lea_name
 # After cleaning datasets of all years, they can be easily combined and cleaned a bit more so columns are strings or numeric where they should be.
@@ -59,76 +94,150 @@ data_combined<-data_combined |>
   )
 ```
 
-**FINDING** All counties but XX saw significant growth in Hispanic student enrollment in 2024. 
-
-Maryland and DMV outlets reported a drop of 4.4% in the graduation rate of Hispanic students in the state according to School Board President Josh Michael. 
-
-**NOTE** 
-Data is created near the start of the calendar year it represents. E.g., percent change for 2026 is the change from the beginning of 2025 to beginning of 2026. 
-
-
+Create state and county dataframes. Mutate columns for percent of Hispanic students and growth rate in Hispanic student enrollment. 
 ```{r}
 options(scipen = 999)  # Disable scientific notation globally
 
 state_data <- data_combined |> 
   filter(
     lea_name == "state",
-    race == "hispanic/latino of any race",
+    race %in% c("hispanic/latino of any race", "all")
   ) |>
   group_by(year) |> 
-    summarize(
-      attendance = sum(enrolled_count, na.rm = TRUE),
-      .groups = "drop"
-  ) |> 
-  arrange(year) |>
+  summarize(
+    attendance = sum(enrolled_count[race == "hispanic/latino of any race"], na.rm = TRUE),
+    total_attendance = sum(enrolled_count[race == "all"], na.rm = TRUE),
+    .groups = "drop"
+  ) |>
   mutate(
+    pct_hispanic = 100 * (attendance / total_attendance),
     pct_change = 100 * (attendance / lag(attendance) - 1)
-  )
+  ) |>
+  arrange(year)
 
 counties_data <- data_combined |> 
   filter(
-    race == "hispanic/latino of any race",
+    race %in% c("hispanic/latino of any race", "all"),
     school != "a"
   ) |>
   group_by(lea_name, year) |>
-  summarize(
-    attendance = sum(enrolled_count, na.rm = TRUE),
+  summarise(
+    attendance = sum(enrolled_count[race == "hispanic/latino of any race"], na.rm = TRUE),
+    total_attendance = sum(enrolled_count[race == "all"], na.rm = TRUE),
     .groups = "drop"
-  ) |> 
+  ) |>
+  mutate(pct_hispanic = 100 * (attendance / total_attendance)) |>
   arrange(lea_name, year) |>
+  group_by(lea_name) |>
   mutate(
     pct_change = 100 * (attendance / lag(attendance) - 1)
+  ) |>
+  filter(year != 2020)
+
+state_data <- state_data |>
+  filter(year != "2020")
+
+counties_data <- counties_data |>
+  filter(year != "2020")
+```
+
+Create a dataframe for individual schools and for visuals showing schools with the largest Hispanic student populations and largest declines in Hispanic student enrollment. Mutate columns for percent of Hispanic students and growth rate in Hispanic student enrollment. 
+```{r}
+schools_hispanic <- data_combined |> 
+  filter(school != "a") |>
+  group_by(school_name, year, lea_name) |>
+  summarise(
+    hispanic_attendance = enrolled_count[race == "hispanic/latino of any race"],
+    total_attendance = enrolled_count[race == "all"],
+    .groups = "drop"
+  ) |>
+  mutate(
+    pct_hispanic = 100 * (hispanic_attendance/total_attendance)
+  ) |>
+  group_by(school_name) |>
+  mutate(
+    pct_change = 100 * (hispanic_attendance / lag(hispanic_attendance) - 1)
+  ) |>
+  arrange(desc(hispanic_attendance))
+
+large_hispanic_schools <- schools_hispanic |>
+  ungroup() |>
+  filter(year == 2026) |>
+  slice_max(hispanic_attendance, n = 20) |>
+  arrange(hispanic_attendance) |>
+  mutate(school_name = str_to_title(school_name),
+         lea_name = str_to_title(lea_name))
+
+write.csv(large_hispanic_schools, "C:/Users/willi/OneDrive/Documents/GitHub/will-hammann/data/large_hispanic_schools.csv", row.names = FALSE)
+
+hispanic_exodus_schools <- schools_hispanic |>
+  ungroup() |>
+  filter(year == 2026, hispanic_attendance >= 500) |>
+  slice_min(pct_change, n = 20) |>
+  arrange(pct_change) |>
+  select(school_name, pct_change, hispanic_attendance, pct_hispanic, lea_name) |>
+  mutate(
+    school_name = str_to_title(school_name),
+    lea_name = str_to_title(lea_name)
   )
 
-state_data |>
-  filter(year != "2020")
+write.csv(hispanic_exodus_schools, "C:/Users/willi/OneDrive/Documents/GitHub/will-hammann/data/hispanic_exodus_schools.csv", row.names = FALSE)
+```
 
-counties_data |>
-  filter(year != "2020")
+Write dataframes to csvs.
+```{r}
+counties_data <- counties_data |>
+  mutate(lea_name = str_to_title(lea_name))
+
+schools_hispanic <- schools_hispanic |>
+  mutate(school_name = str_to_title(school_name),
+         lea_name = str_to_title(lea_name))
+
+
+write.csv(counties_data |>
+            filter(year == 2022), "C:/Users/willi/OneDrive/Documents/GitHub/will-hammann/data/2022counties_hispanic_enrollment.csv", row.names = FALSE)
+
+write.csv(counties_data |>
+            filter(year == 2026), "C:/Users/willi/OneDrive/Documents/GitHub/will-hammann/data/2026counties_hispanic_enrollment.csv", row.names = FALSE)
+
+write.csv(state_data, "C:/Users/willi/OneDrive/Documents/GitHub/will-hammann/data/mdstate_hispanic_enrollment.csv", row.names = FALSE)
+
+write.csv(schools_hispanic, "C:/Users/willi/OneDrive/Documents/GitHub/will-hammann/data/schools_hispanic_enrollment.csv", row.names = FALSE)
 ```
 
 
-## Statistical research by Stanford professors showed a 7.3% decrease in Hispanic enrollment in counties ICE partnerships with local police nationwide in the 2000s, establishing precedent for...
-
-## Including but not exclusive to his administration, I can also look at the correlation between Hispanic enrollment and 287(g) agreements in counties or even municipalities.
+Analyze the difference between arrest rates under Biden's final year and Trump's first year in office.
 ```{r}
-dhs_287gs<-read.csv("../data/287g_agreements_dhs.csv") |>
+ice_arrests<-read_csv("../data/ice_arrests_082022_032026.csv") |>
   clean_names()
+
+ice_maryland <- ice_arrests |>
+  filter(apprehension_state == "MARYLAND") |>
+  select(apprehension_date, apprehension_state)
+
+ice_maryland <- ice_arrests |>
+  mutate(apprehension_date = as.Date(apprehension_date),
+    term = case_when(
+      apprehension_date >= "2024-01-20" & apprehension_date <= "2025-01-19" ~ "Biden final year",
+      apprehension_date >= "2025-01-20" & apprehension_date <= "2026-01-19" ~ "Trump second term",
+      TRUE ~ NA_character_
+    )
+  ) |>
+  filter(!is.na(term)) |>
+  group_by(term) |>
+  summarize(arrests = n())
 ```
 
-
-## Potential Sources
-# 
-
-
-## Attendance by Race by School for a Specific County in 2020
+##DEVTOOLS AND MAPS AND STUFF
 ```{r}
-data_2020 |> 
-  filter(lea_name == "Calvert") |> 
-  group_by(school_name, race) |>
-  summarize(
-    Attendance = sum(enrolled_count, na.rm = TRUE)
-  ) |> 
-  arrange(school_name, race)
+#install.packages("rlang")
+library(rlang)
+install.packages("devtools") # if not already installed on your system
 
+library(devtools)
+devtools::install_github("munichrocker/DatawRappr")
+
+library(DatawRappr)
+library(tidyverse)
+datawrapper_auth(api_key =  "xyZJBlSvkKhheld0eaGn3z6UMYV1fcoenk7jRoiIyrymWteHcQ8E7qXqU8d28duI", overwrite=TRUE)
 ```
