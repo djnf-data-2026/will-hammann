@@ -3,15 +3,19 @@ title: "Hispanic student enrollment began to fall after Trump took office, endin
 author: "Will Hammann"
 date: "2026-06-01"
 output: html_document
+execute:
+  echo: true
+  warning: false
+  message: false
 ---
 
-\#![Graduates of High Point High School, Maryland's largest Hispanic population school, in Beltsville, MD (Source: Prince George's County Public Schools)](images/highpointhigh_24_students_pgcps.jpg){alt="CAPTION FOR YOUR PHOTO"}
+![Graduates of High Point High School in Beltsville, MD. (Photo: PGCPS)](https://raw.githubusercontent.com/djnf-data-2026/will-hammann/main/images/highpointhigh_24_students_pgcps.jpg){width="900"}
 
 After years of consistent growth of Hispanic student enrollment across Maryland, the rate slowed to a decline in the first school year of Donald Trump's second term.
 
 Just after Trump's inauguration in 2025, his administration rescinded the Biden-era policy that directed U.S. immigration enforcement agents to refrain from apprehending people at or around "sensitive locations," such as hospitals, places of worships and schools.
 
-That change has been just one facet of the administration's intensified immigration enforcement policies. Its operations have shifted focus from near the U.S. border to within the interior, clashed with judges after illegal deportations and apprehensions, oversaw a record number of deaths among ICE detainees and killed several bystanders and civilians such as Alex Pretti and Renee Good. \
+That change has been just one facet of the administration's intensified immigration enforcement policies. Its operations have shifted focus from near the U.S. border to within the interior, clashed with judges after illegal deportations and apprehensions, oversaw a record number of deaths among ICE detainees and killed several bystanders and civilians such as Alex Pretti and Renee Good.\
 \
 Immigrant advocacy groups have warned how the administration's immigration enforcement has impacted Hispanic students, including the more than 200,000 who attend Maryland schools.
 
@@ -105,7 +109,7 @@ I've also spoken to George Escobar at CASA who is a great orator and excellent s
 
 The ICE arrest data from the Deportation Data Project is messy and rows and challenging to tie down to specific locations and jurisdictions. Still, it could be feasible to analyze, aggregate and map the data to directly compare ICE activity to counties or schools where the most dramatic changes to Hispanic student enrollment occured. Trump's term isn't over, so any further escalations of immigration enforcement could entail additional changes to the state's enrollment rate of Hispanic students.
 
-Though 287(g) agreements in Maryland were banned in February, some have only recently been voided and enrollment data isn't recent enough to see an impact. After some time, I can examine the difference in Hispanic enrollment in localities where there used to be 287(g) agreements. \
+Though 287(g) agreements in Maryland were banned in February, some have only recently been voided and enrollment data isn't recent enough to see an impact. After some time, I can examine the difference in Hispanic enrollment in localities where there used to be 287(g) agreements.\
 \
 Data on graduation rates is released a year after enrollment rate data, but it's worth reporting once it comes out. Similar to its impact on enrollment, harsher immigration enforcement targeting sensitive areas and the stress and fear it induces all pose a challenge to Hispanic students' academic performance.
 
