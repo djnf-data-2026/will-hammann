@@ -1,5 +1,5 @@
 ---
-title: "Hispanic student enrollment began to fall after Trump took office, ending years of growth"
+title: "Less Hispanic students are enrolling in K-12 schools as ICE intensification continues"
 author: "Will Hammann"
 date: "2026-06-01"
 output: html_document
@@ -7,6 +7,16 @@ execute:
   echo: true
   warning: false
   message: false
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-title: "Contents"
+    theme: pulse
+    mainfont: "Lora"
+    include-in-header:
+      text: |
+        <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 ---
 
 ![Graduates of High Point High School in Beltsville, MD. (Photo: PGCPS)](https://raw.githubusercontent.com/djnf-data-2026/will-hammann/main/images/highpointhigh_24_students_pgcps.jpg){width="900"}
@@ -45,26 +55,7 @@ Reports from across the country, like by [MPR News in Minnesota](https://www.mpr
 The difference in Maryland's Hispanic student enrollment during Biden's term and since the start of Trump's second term can be seen across all of its counties.
 
 ```{=html}
-<div style="text-align: left; margin-bottom: 10px;">
-<a onclick="showMap('2022'); return false;" href="#" style="cursor:pointer; color:#fff; background-color:#4a1486; padding:10px; border-radius:5px; margin-right:5px;">2022</a>
-<a onclick="showMap('2026'); return false;" href="#" style="cursor:pointer; color:#fff; background-color:#807dba; padding:10px; border-radius:5px;">2026</a>
-</div>
-
-<div id="map-2022">
-<iframe src="https://datawrapper.dwcdn.net/GAgz9/4/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" data-external="1"></iframe>
-</div>
-
-<div id="map-2026" style="display:none;">
-<iframe src="https://datawrapper.dwcdn.net/PvIsf/2/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" data-external="1"></iframe>
-</div>
-
-<script type="text/javascript">
-function showMap(year) {
-  document.getElementById('map-2022').style.display = year === '2022' ? 'block' : 'none';
-  document.getElementById('map-2026').style.display = year === '2026' ? 'block' : 'none';
-}
-(function(){function e(){window.addEventListener(`message`,function(e){if(e.data[`datawrapper-height`]!==void 0){var t=document.querySelectorAll(`iframe`);for(var n in e.data[`datawrapper-height`])for(var r=0,i;i=t[r];r++)if(i.contentWindow===e.source){var a=e.data[`datawrapper-height`][n]+`px`;i.style.height=a}}})}e()})();
-</script>
+<iframe title="Percent change of Hispanic student enrollment in 2021-22" aria-label="Choropleth map" id="datawrapper-chart-GAgz9" src="https://datawrapper.dwcdn.net/GAgz9/14/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="500" data-external="1"></iframe><script type="text/javascript">(function(){function e(){window.addEventListener(`message`,function(e){if(e.data[`datawrapper-height`]!==void 0){var t=document.querySelectorAll(`iframe`);for(var n in e.data[`datawrapper-height`])for(var r=0,i;i=t[r];r++)if(i.contentWindow===e.source){var a=e.data[`datawrapper-height`][n]+`px`;i.style.height=a}}})}e()})();</script>
 ```
 
 The more than 830,000 Hispanic residents of Maryland make up 13.3% of the state's population, according to the 2025 U.S. Census. Nearly a quarter of those people are enrolled in Maryland schools, densely concentrated in Prince George's and Montgomery counties but spread all over the state.
@@ -99,7 +90,7 @@ The schools with the sharpest declines in Hispanic student enrollment were also 
 
 ## Potential Sources
 
-Immigrant or Hispanic advocacy groups could help me gain a better understanding of the way immigration enforcement policy impacts education for Hispanic residents. Using that knowledge, I would focus my reporting on school PTO and community members of the high schools with the hightest populations of Hispanic students, like High Point High in Beltsville.\
+Immigrant or Hispanic advocacy groups could help me gain a better understanding of the way immigration enforcement policy impacts education for Hispanic residents. Using that knowledge, I would focus my reporting on school PTO and community members of the high schools with the highest populations of Hispanic students, like High Point High in Beltsville.\
 \
 From my personal reporting experience in Hyattsville, I know members of the Cesar Chavez Dual Immersion School's PTO who have voiced concerns of ICE activity and its impact consistently over years. I can see what those people have to say about this issue.
 
@@ -107,7 +98,7 @@ I've also spoken to George Escobar at CASA who is a great orator and excellent s
 
 ## What's Next
 
-The ICE arrest data from the Deportation Data Project is messy and rows and challenging to tie down to specific locations and jurisdictions. Still, it could be feasible to analyze, aggregate and map the data to directly compare ICE activity to counties or schools where the most dramatic changes to Hispanic student enrollment occured. Trump's term isn't over, so any further escalations of immigration enforcement could entail additional changes to the state's enrollment rate of Hispanic students.
+The ICE arrest data from the Deportation Data Project is messy and rows are challenging to tie down to specific locations and jurisdictions. Still, it could be feasible to analyze, aggregate and map the data to directly compare ICE activity to counties or schools where the most dramatic changes to Hispanic student enrollment occurred. Trump's term isn't over, so any further escalations of immigration enforcement could entail additional changes to the state's enrollment rate of Hispanic students.
 
 Though 287(g) agreements in Maryland were banned in February, some have only recently been voided and enrollment data isn't recent enough to see an impact. After some time, I can examine the difference in Hispanic enrollment in localities where there used to be 287(g) agreements.\
 \
@@ -306,17 +297,5 @@ ice_maryland <- ice_arrests |>
   group_by(term) |>
   summarize(arrests = n())
 ```
-
-## Businesses to Watch
-
-[Perdue Farms is the fourth-largest poultry company in the U.S., and the leader of the \$1.6 billion industry in the state of Maryland](https://commerce.maryland.gov/Documents/ResearchDocument/MarylandAgribusinessIndustryFactSheet.pdf). The company is largely vertically integrated, contracting farmers who lease chickens from Perdue, operations mostly based in the Eastern Shore. Though the region has relatively small populations of Hispanic residents, the demographic makes up much of the sector’s labor, including transient and vulnerable residents, such as those who are undocumented or who have guest visas. Crop farming is also integral to the industry as [locally produced corn, soybeans and winter wheat are used to supply chicken feed](https://lesmd.net/agriculture/agri-business). 
-
-In 2023, Perdue Farms agreed to pay \$60.7 million to settle claims the company conspired to lower wages and suppress labor competition at its facilities, as reported by [Bloomberg Law](https://news.bloomberglaw.com/antitrust/perdue-farms-to-pay-60-7-million-to-settle-wage-fixing-claims). [Polluted runoff in the Chesapeake Bay](https://www.sierraclub.org/maryland/poultry-pollution) mostly comes from the state’s agriculture industry, leading to environmental scrutiny of poultry farming, the industry’s largest sector. Perdue Farms is a private company, posing a barrier to transparency and reporting. 
-
-Unlike Maryland's agribusiness, the hospitality industry is led by a public giant. Marriott International, headquartered in Bethesda, sprawls throughout the state and across the world from the heart of Montgomery County.
-
-Marriott’s website lists 112 hotels in the state. [According to a 2018 article by OpenArc Support in the Prince George’s Sentinel](https://www.thesentinel.com/communities/montgomery/news/business/bethesda-proves-to-be-ground-zero-for-hotel-businesses/article_27cfc600-a612-5c6d-8344-01ea19fde86e.html), there are 18 hotels employing 2,000 people in Montgomery County, which contains more than a quarter of Maryland’s Hispanic population. In Maryland and the U.S., Hispanic workers are largely employed by the hospitality industry.
-
-[This Q1](https://www.sec.gov/ix?doc=/Archives/edgar/data/0001048286/000104828626000014/mar-20260331.htm#i48008e55f9f545e0b12b06c628391d2f_199), Marriott’s largest source of revenue was from fee revenues, such as licensing fees charged to franchise owners, at nearly \$1.4 billion. Their largest expense was operating costs and overheads for owned and leased properties at \$377 million and the company came away with \$648 million of net income.
 
 --30--
